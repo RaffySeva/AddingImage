@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Adding Image</title>
+</head>
+<body>
+  <form>
+    <label>Food Name</label>
+    <input type="text" id="foodName"><br><br>
+    <input type="file" id="fileButton">
+    <button type="button" id="submitButton" onclick="addImage()">SUBMIT</button>
+  </form>
+</body>
+<html>
+<script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyDmswNaJye0aSPHMj5kZm172OjY1EHHr8Q",
+    authDomain: "addingimage-6e3ec.firebaseapp.com",
+    databaseURL: "https://addingimage-6e3ec.firebaseio.com",
+    projectId: "addingimage-6e3ec",
+    storageBucket: "addingimage-6e3ec.appspot.com",
+    messagingSenderId: "436208085405"
+  };
+  firebase.initializeApp(config);
+</script>
+<script>
+  // CLYDE READ ME! Maka insert nako pero dile maka insert sa name
+  var firebaseDatabaseRef = firebase.database().ref('images/');
+  var submitButton = document.getElementById('submitButton');
+  var fileButton = document.getElementById('fileButton');
+  var fileName = document.getElementById('foodName').value; // I can't seem to get the value
+  var file;
+
+  fileButton.addEventListener('change', function(e){
+    file = e.target.files[0];
+    console.log("ni sulod ko sa event listener");
+  });
+
+  function addImage()
+  {
+    console.log("Ni sulod ko sa add image");
+    console.log(fileName);
+    var filename = file.name;
+    var storageRef = firebase.storage().ref('Sugbahan/images/' + filename);
+    var uploadTask = storageRef.put(file);
+    // Register three observers:
+    // 1. 'state_changed' observer, called any time the state changes
+    // 2. Error observer, called on failure
+    // 3. Completion observer, called on successful completion
+    uploadTask.on('state_changed', function(snapshot){
+      // Observe state change events such as progress, pause, and resume
+      // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+    }, function(error) {
+      // Handle unsuccessful uploads
+    }, function() {
+      // Handle successful uploads on complete
+      // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+
+      var downloadURL = uploadTask.snapshot.downloadURL;
+      var data = {
+        url : downloadURL,
+        name : fileName
+      }
+      firebaseDatabaseRef.set(data);
+      console.log(downloadURL);
+    });
+  }
+</script>
